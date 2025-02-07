@@ -1,2 +1,1 @@
-# ivarehpersonalwebsite
-Personal website for Ivar Haugland
+# Personal website for Ivar Haugland
