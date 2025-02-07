@@ -1,1 +1,1 @@
-# Personal website for Ivar Haugland
+# My name is Ivar
