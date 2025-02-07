@@ -1,6 +1,7 @@
 import { Box, Container, Text } from "@chakra-ui/react"
 import { createFileRoute } from "@tanstack/react-router"
 
+
 export const Route = createFileRoute("/_layout/")({
   component: Dashboard,
 })
@@ -10,9 +11,16 @@ function Dashboard() {
     <>
       <Container maxW="full">
         <Box pt={12} m={4}>
-          <Text fontSize="2xl">
+          <Text as="pre" color="white" fontSize="md" fontFamily="monospace">
+            {String.raw`
+              ██╗██╗   ██╗ █████╗ ██████╗    ██████╗ ███████╗██╗   ██╗
+              ██║██║   ██║██╔══██╗██╔══██╗   ██╔══██╗██╔════╝██║   ██║
+              ██║██║   ██║███████║██████╔╝   ██║  ██║█████╗  ██║   ██║
+              ██║╚██╗ ██╔╝██╔══██║██╔══██╗   ██║  ██║██╔══╝  ╚██╗ ██╔╝
+              ██║ ╚████╔╝ ██║  ██║██║  ██║██╗██████╔╝███████╗ ╚████╔╝
+              ╚═╝  ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═════╝ ╚══════╝  ╚═══╝
+            `}
           </Text>
-          <Text>Welcome to Ivar's dev page!</Text>
         </Box>
       </Container>
     </>
