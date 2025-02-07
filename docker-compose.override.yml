@@ -101,7 +101,6 @@ services:
     ipc: host
     depends_on:
       - backend
-      - mailcatcher
     env_file:
       - .env
     environment:
