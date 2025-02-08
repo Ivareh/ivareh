@@ -38,11 +38,10 @@ const LoadAnimatedText = ({ texts }: LoadTextProps) => {
   }, { scope: onLoadText })
 
 
-  const textToLoadFast = `Need help? Type 'help' and hit ENTER or RETURN`
 
   const CharTextsLoad = () => (
     <Flex color="white" flexDirection="column" ref={onLoadText}>
-      {texts.map((text) => text.speed === "slow" ? (text.text.split("\n").map((line, lineIndex) => (
+      {texts.map((text, textIndex) => text.speed === "slow" ? (text.text.split("\n").map((line, lineIndex) => (
         <Flex
           key={lineIndex}
           whiteSpace="pre"
@@ -65,7 +64,7 @@ const LoadAnimatedText = ({ texts }: LoadTextProps) => {
         </Flex>
       ))
       ) : (
-        <Text className="loadTextFast"> {textToLoadFast} </Text>
+        <Text className="loadTextFast" key={textIndex}> {text.text} </Text>
       )
       )}
     </Flex>
