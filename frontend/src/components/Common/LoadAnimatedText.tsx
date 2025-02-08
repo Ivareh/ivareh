@@ -1,34 +1,48 @@
+/// <reference types="vite/client" />
+
 import { useRef } from "react"
 
 import gsap from "gsap"
 import { useGSAP } from "@gsap/react";
 import { Flex, Text } from "@chakra-ui/react"
 
-const Console = () => {
+export interface Text {
+  text: string;
+  speed: "slow" | "fast";
+}
+
+interface LoadTextProps {
+  texts: Text[]
+}
+
+
+const LoadAnimatedText = ({ texts }: LoadTextProps) => {
   gsap.registerPlugin(useGSAP);
 
   const onLoadText = useRef(null);
 
   useGSAP(() => {
-    gsap.fromTo(
-      ".loadText",
+    var tl = gsap.timeline();
+
+    tl.fromTo(
+      ".loadTextSlow",
       { opacity: 0 },
-      { opacity: 1, duration: 0.01, stagger: 0.05 }
+      { opacity: 1, duration: 0.08, stagger: 0.07 }
     );
+    tl.fromTo(
+      ".loadTextFast",
+      { opacity: 0 },
+      { opacity: 1, duration: 0.00001 }
+    )
+
   }, { scope: onLoadText })
 
-  const textToLoad = `Hello, I am Ivar.
-This is my terminal.
-Its purpose is to learn something about Ivar.
 
-----------------
-    `;
-
-  const lines = textToLoad.split('\n');
+  const textToLoadFast = `Need help? Type 'help' and hit ENTER or RETURN`
 
   const CharTextsLoad = () => (
     <Flex color="white" flexDirection="column" ref={onLoadText}>
-      {lines.map((line, lineIndex) => (
+      {texts.map((text) => text.speed === "slow" ? (text.text.split("\n").map((line, lineIndex) => (
         <Flex
           key={lineIndex}
           whiteSpace="pre"
@@ -42,24 +56,25 @@ Its purpose is to learn something about Ivar.
               >&nbsp;</Text>
             ) : (
               <Text
-                className="loadText"
+                className="loadTextSlow"
                 key={`${lineIndex}-${charIndex}`}
                 as="span"
               >{char}</Text>
             )
           ))}
         </Flex>
-      ))}
+      ))
+      ) : (
+        <Text className="loadTextFast"> {textToLoadFast} </Text>
+      )
+      )}
     </Flex>
   );
-
   return (
-    <Flex>
-      <Flex>
-        <CharTextsLoad />
-      </Flex>
-    </Flex>
+    <>
+      <CharTextsLoad />
+    </>
   )
 }
 
-export default Console
+export default LoadAnimatedText
