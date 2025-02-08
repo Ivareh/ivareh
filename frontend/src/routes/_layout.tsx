@@ -9,7 +9,7 @@ export const Route = createFileRoute("/_layout")({
 function Layout() {
 
   return (
-    <Flex bgColor="ui.main" maxW="large" h="auto" position="relative">
+    <Flex bgColor="ui.main" h="100vh" position="relative">
       <Outlet />
     </Flex>
   )
