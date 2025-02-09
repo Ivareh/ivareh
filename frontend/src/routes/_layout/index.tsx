@@ -1,7 +1,7 @@
 import { Container, Box, Text } from "@chakra-ui/react"
 import { createFileRoute } from "@tanstack/react-router"
 
-import Console from "../../components/Console/Console"
+import Terminal from "../../components/Terminal/Terminal"
 
 export const Route = createFileRoute("/_layout/")({
   component: Dashboard,
@@ -24,7 +24,7 @@ function Dashboard() {
           `}
           </Text>
         </Box>
-        <Console />
+        <Terminal />
       </Container>
     </>
   )

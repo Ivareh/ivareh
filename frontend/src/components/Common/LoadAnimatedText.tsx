@@ -1,6 +1,5 @@
 /// <reference types="vite/client" />
-
-import { useRef } from "react"
+import { useRef, useState } from "react"
 
 import gsap from "gsap"
 import { useGSAP } from "@gsap/react";
@@ -17,32 +16,34 @@ interface LoadTextProps {
 
 
 const LoadAnimatedText = ({ texts }: LoadTextProps) => {
+  const [animated, setAnimated] = useState<Set<number>>(new Set<number>([]))
   const containerRef = useRef(null);
   const tl = useRef<gsap.core.Timeline>();
 
   useGSAP(() => {
     tl.current = gsap.timeline();
-
     texts.forEach((_, index) => {
-      tl.current!.fromTo(
-        `.loadTextSlow-${index}`,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.08, stagger: 0.07 },
-        ">"
-      );
+      if (!(animated.has(index))) {
+        tl.current!.fromTo(
+          `.loadTextSlow-${index}`,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.08, stagger: 0.07 },
+          ">"
+        );
 
-      tl.current!.fromTo(
-        `.loadTextFast-${index}`,
-        { opacity: 0 },
-        { opacity: 1, duration: 0.00001, stagger: 0 },
-        ">"
-      );
+        tl.current!.fromTo(
+          `.loadTextFast-${index}`,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.00001, stagger: 0 },
+          ">"
+        );
+      }
+      setAnimated((prev) => new Set([...prev, index]))
     });
-  }, { scope: containerRef });
+  }, { dependencies: [texts], scope: containerRef });
 
   const renderText = (text: Text, textIndex: number) => {
     const className = `loadText${text.speed === 'slow' ? 'Slow' : 'Fast'}-${textIndex}`;
-
     return text.text.split("\n").map((line, lineIndex) => (
       <Flex key={`${textIndex}-${lineIndex}`} whiteSpace="pre" as="span">
         {line.split('').map((char, charIndex) => (
