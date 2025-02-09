@@ -17,63 +17,61 @@ interface LoadTextProps {
 
 
 const LoadAnimatedText = ({ texts }: LoadTextProps) => {
-  gsap.registerPlugin(useGSAP);
-
-  const onLoadText = useRef(null);
+  const containerRef = useRef(null);
+  const tl = useRef<gsap.core.Timeline>();
 
   useGSAP(() => {
-    var tl = gsap.timeline();
+    tl.current = gsap.timeline();
 
-    tl.fromTo(
-      ".loadTextSlow",
-      { opacity: 0 },
-      { opacity: 1, duration: 0.08, stagger: 0.07 }
-    );
-    tl.fromTo(
-      ".loadTextFast",
-      { opacity: 0 },
-      { opacity: 1, duration: 0.00001 }
-    )
+    texts.forEach((_, index) => {
+      tl.current!.fromTo(
+        `.loadTextSlow-${index}`,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.08, stagger: 0.07 },
+        ">"
+      );
 
-  }, { scope: onLoadText })
+      tl.current!.fromTo(
+        `.loadTextFast-${index}`,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.00001, stagger: 0 },
+        ">"
+      );
+    });
+  }, { scope: containerRef });
 
+  const renderText = (text: Text, textIndex: number) => {
+    const className = `loadText${text.speed === 'slow' ? 'Slow' : 'Fast'}-${textIndex}`;
 
+    return text.text.split("\n").map((line, lineIndex) => (
+      <Flex key={`${textIndex}-${lineIndex}`} whiteSpace="pre" as="span">
+        {line.split('').map((char, charIndex) => (
+          char === ' ' ? (
+            <Text key={`${textIndex}-${lineIndex}-${charIndex}`} as="span">&nbsp;</Text>
+          ) : (
+            <Text
+              key={`${textIndex}-${lineIndex}-${charIndex}`}
+              className={className}
+              as="span"
+            >
+              {char}
+            </Text>
+          )
+        ))}
+      </Flex>
+    ));
+  };
 
-  const CharTextsLoad = () => (
-    <Flex color="white" flexDirection="column" ref={onLoadText}>
-      {texts.map((text, textIndex) => text.speed === "slow" ? (text.text.split("\n").map((line, lineIndex) => (
-        <Flex
-          key={lineIndex}
-          whiteSpace="pre"
-          as="span"
-        >
-          {line.split('').map((char, charIndex) => (
-            char === ' ' ? (
-              <Text
-                key={`${lineIndex}-${charIndex}`}
-                as="span"
-              >&nbsp;</Text>
-            ) : (
-              <Text
-                className="loadTextSlow"
-                key={`${lineIndex}-${charIndex}`}
-                as="span"
-              >{char}</Text>
-            )
-          ))}
-        </Flex>
-      ))
-      ) : (
-        <Text className="loadTextFast" key={textIndex}> {text.text} </Text>
-      )
-      )}
+  return (
+    <Flex color="white" flexDirection="column" ref={containerRef}>
+      {texts.map((text, textIndex) => (
+        <div key={textIndex}>
+          {renderText(text, textIndex)}
+        </div>
+      ))}
     </Flex>
   );
-  return (
-    <>
-      <CharTextsLoad />
-    </>
-  )
-}
+};
 
-export default LoadAnimatedText
+export default LoadAnimatedText;
+
