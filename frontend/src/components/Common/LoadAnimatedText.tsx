@@ -1,9 +1,10 @@
 /// <reference types="vite/client" />
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect } from "react"
 
 import gsap from "gsap"
 import { useGSAP } from "@gsap/react";
 import { Flex, Text } from "@chakra-ui/react"
+import { useTermPromptState } from "../../store/TermPromptState";
 
 export interface Text {
   text: string;
@@ -20,8 +21,15 @@ const LoadAnimatedText = ({ texts }: LoadTextProps) => {
   const containerRef = useRef(null);
   const tl = useRef<gsap.core.Timeline>();
 
+  const { setCurProcessingPrompt } = useTermPromptState();
+
   useGSAP(() => {
-    tl.current = gsap.timeline();
+    tl.current = gsap.timeline({
+      onStart: () => setCurProcessingPrompt(true),
+      onComplete: () => setCurProcessingPrompt(false),
+    }
+    );
+
     texts.forEach((_, index) => {
       if (!(animated.has(index))) {
         tl.current!.fromTo(
@@ -41,6 +49,12 @@ const LoadAnimatedText = ({ texts }: LoadTextProps) => {
       setAnimated((prev) => new Set([...prev, index]))
     });
   }, { dependencies: [texts], scope: containerRef });
+
+  useEffect(() => {
+    if (tl.current && tl.current.isActive()) {
+      setCurProcessingPrompt(tl.current.isActive())
+    }
+  }, [tl.current])
 
   const renderText = (text: Text, textIndex: number) => {
     const className = `loadText${text.speed === 'slow' ? 'Slow' : 'Fast'}-${textIndex}`;

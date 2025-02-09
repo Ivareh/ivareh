@@ -9,7 +9,7 @@ import { useTermPromptState } from "../../store/TermPromptState"
 
 const Terminal = () => {
 
-  const { latestPrompt } = useTermPromptState();
+  const { curProcessingPrompt, latestPrompt } = useTermPromptState();
 
   const introTexts: Text[] = [{
     text: `Hello, I am Ivar.
@@ -28,20 +28,23 @@ Welcome to my terminal.
   useEffect(() => {
     if (latestPrompt) {
       const latestPromptWoCount = latestPrompt.split(/\$(.*)/s)[1]
+
       if (!(commands.has(latestPromptWoCount))) {
         const commandNotFoundMsg = commandNotFound(latestPromptWoCount)
         setTextsToGen((prev) => [...prev, { text: commandNotFoundMsg, speed: "fast" }])
         return
       }
 
-      setTextsToGen((prev) => [...prev, { text: `\n\n Available commands: \n ${Array.from(commands).join("\n")}`, speed: "fast" }])
+      setTextsToGen((prev) => [...prev, { text: `\n\n Available commands: \n ${Array.from(commands).join("\n")}`, speed: "fast" }])
     }
   }, [latestPrompt])
 
   return (
     <Grid w="1000px" p={1} borderColor="ui.tmuxBorder" borderWidth={"1px"} >
       <LoadAnimatedText texts={textsToGen} />
-      <TerminalPrompter />
+      {!curProcessingPrompt &&
+        <TerminalPrompter />
+      }
     </Grid>
   )
 }
