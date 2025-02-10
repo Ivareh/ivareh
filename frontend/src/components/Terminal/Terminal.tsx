@@ -40,7 +40,7 @@ Welcome to my terminal.
   }, [latestPrompt])
 
   return (
-    <Grid w="1000px" p={1} borderColor="ui.tmuxBorder" borderWidth={"1px"} >
+    <Grid p={1} borderColor="ui.tmuxBorder" borderWidth={"1px"} >
       <LoadAnimatedText texts={textsToGen} />
       {!curProcessingPrompt &&
         <TerminalPrompter />

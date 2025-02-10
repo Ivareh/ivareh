@@ -12,10 +12,8 @@ export const useTermPromptState = create<TermPromptState>((set) => ({
 
   setCurProcessingPrompt: (state: boolean) =>
     set(() => {
-      console.log(state)
       return {
         curProcessingPrompt: state,
-
       }
     }),
 
