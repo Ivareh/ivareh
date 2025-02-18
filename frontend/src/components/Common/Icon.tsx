@@ -24,4 +24,3 @@ export const BlockyPurpleArrow = createIcon({
     boxSize: '14px',
   },
 })
-

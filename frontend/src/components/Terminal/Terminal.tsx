@@ -1,16 +1,13 @@
 import { useState, useEffect } from "react"
+import {v4 as uuidv4} from "uuid"
 
 import { Grid } from "@chakra-ui/react"
 
 import TerminalPrompter from "./TerminalPrompter"
-import LoadAnimatedText, { Text } from "../Common/LoadAnimatedText"
+import LoadAnimatedText, { Text } from "../Terminal/Animation/LoadAnimatedText"
 import commands from "../Terminal/Commands"
-import { useTermPromptState } from "../../store/TermPromptState"
 
 const Terminal = () => {
-
-  const { curProcessingPrompt, latestPrompt } = useTermPromptState();
-
   const introTexts: Text[] = [{
     text: `Hello, I am Ivar.
 Welcome to my terminal.
@@ -25,25 +22,33 @@ Welcome to my terminal.
 
   const [textsToGen, setTextsToGen] = useState<Text[]>(introTexts)
 
-  useEffect(() => {
-    if (latestPrompt) {
-      const latestPromptWoCount = latestPrompt.split(/\$(.*)/s)[1]
+  const [processingPrompt, setProcessingPrompt] = useState<boolean>()
+  const [prompt, setPrompt] = useState<string>()
+  const [termKey, setTermKey] = useState<string>()
 
-      if (!(commands.has(latestPromptWoCount))) {
-        const commandNotFoundMsg = commandNotFound(latestPromptWoCount)
+  useEffect(() => {
+    if (prompt) {
+      const latestPrompt = prompt.split(/\$(.*)/s)[1]
+
+      if (!(latestPrompt in commands)) {
+        const commandNotFoundMsg = commandNotFound(latestPrompt)
         setTextsToGen((prev) => [...prev, { text: commandNotFoundMsg, speed: "fast" }])
         return
       }
 
-      setTextsToGen((prev) => [...prev, { text: `\n\n Available commands: \n ${Array.from(commands).join("\n")}`, speed: "fast" }])
+      setTextsToGen((prev) => [...prev, { text: commands[latestPrompt], speed: "fast" }])
+      if (latestPrompt === "clear") {
+        setTextsToGen([{text: "", speed: "fast"}])
+        setTermKey(uuidv4())
+      }
     }
-  }, [latestPrompt])
+  }, [prompt])
 
   return (
-    <Grid p={1} borderColor="ui.tmuxBorder" borderWidth={"1px"} >
-      <LoadAnimatedText texts={textsToGen} />
-      {!curProcessingPrompt &&
-        <TerminalPrompter />
+    <Grid p={1} borderColor="ui.tmuxBorder" borderWidth={"1px"} key={termKey} >
+      <LoadAnimatedText setProcessingPrompt={setProcessingPrompt} texts={textsToGen} />
+      {!processingPrompt &&
+        <TerminalPrompter setPrompt={setPrompt} />
       }
     </Grid>
   )

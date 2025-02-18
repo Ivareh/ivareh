@@ -1,26 +1,30 @@
-import { useState } from "react"
+import { useState, memo } from "react"
 
 import { Flex, Textarea } from "@chakra-ui/react"
 
 import { BlockyPurpleArrow } from "../Common/Icon"
-import { useTermPromptState } from "../../store/TermPromptState"
+import { randomIntFromInterval } from "./Utils"
 
-const TerminalPrompter = () => {
-  const [promptCount, setPromptCount] = useState<number>(0);
-  const [currentPrompt, setCurrentPrompt] = useState<string | null>(null);
+
+interface TerminalPrompterProps {
+  setPrompt: (prompt: string) => void
+}
+
+const TerminalPrompter = ({ setPrompt }: TerminalPrompterProps) => {
+  const [currentText, setCurrentText] = useState<string>();
+  const [currentPrompt, setCurrentPrompt] = useState<string>(); // Controls value on hit enter
   const [promptFocus, setPromptFocus] = useState<Boolean>(false);
 
-  const { setLatestPrompt } = useTermPromptState();
-
-  const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setCurrentPrompt(event.target.value);
+  const handlePromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setCurrentPrompt(e.target.value);
+    setCurrentText(e.target.value);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (promptFocus && (e.key === "Enter" || e.key === "Return")) {
-      setPromptCount(promptCount + 1)
       // Notice the `$`, for slice. CurrentPrompt is to register change in this variable
-      setLatestPrompt(`${promptCount}$${currentPrompt}`)
+      setPrompt(`${randomIntFromInterval(0, 10000)}$${currentPrompt}`)
+      setCurrentText(undefined)
     }
   };
 
@@ -29,8 +33,9 @@ const TerminalPrompter = () => {
     <Flex maxH="400px" borderWidth={1} color="white" >
       <BlockyPurpleArrow m={1} />
       <Textarea
+        value={currentText}
         cursor="default"
-        onChange={handleChange}
+        onChange={handlePromptChange}
         onKeyDown={(e) => handleKeyDown(e)}
         onFocus={() => setPromptFocus(true)}
         onBlur={() => setPromptFocus(false)}
@@ -40,8 +45,8 @@ const TerminalPrompter = () => {
         maxH="auto"
         variant={"unstyled"}
         resize="none" />
-    </Flex>
+    </Flex >
   )
 }
 
-export default TerminalPrompter
+export default memo(TerminalPrompter);

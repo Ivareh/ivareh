@@ -1,10 +1,9 @@
 /// <reference types="vite/client" />
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect, memo } from "react"
 
 import gsap from "gsap"
 import { useGSAP } from "@gsap/react";
 import { Flex, Text } from "@chakra-ui/react"
-import { useTermPromptState } from "../../store/TermPromptState";
 
 export interface Text {
   text: string;
@@ -13,20 +12,19 @@ export interface Text {
 
 interface LoadTextProps {
   texts: Text[]
+  setProcessingPrompt: (state: boolean) => void;
 }
 
 
-const LoadAnimatedText = ({ texts }: LoadTextProps) => {
+const LoadAnimatedText = ({ texts, setProcessingPrompt }: LoadTextProps) => {
   const [animated, setAnimated] = useState<Set<number>>(new Set<number>([]))
   const containerRef = useRef(null);
   const tl = useRef<gsap.core.Timeline>();
 
-  const { setCurProcessingPrompt } = useTermPromptState();
-
   useGSAP(() => {
     tl.current = gsap.timeline({
-      onStart: () => setCurProcessingPrompt(true),
-      onComplete: () => setCurProcessingPrompt(false),
+      onStart: () => setProcessingPrompt(true),
+      onComplete: () => setProcessingPrompt(false),
     }
     );
 
@@ -52,7 +50,7 @@ const LoadAnimatedText = ({ texts }: LoadTextProps) => {
 
   useEffect(() => {
     if (tl.current && tl.current.isActive()) {
-      setCurProcessingPrompt(tl.current.isActive())
+      setProcessingPrompt(tl.current.isActive())
     }
   }, [tl.current])
 
@@ -88,5 +86,4 @@ const LoadAnimatedText = ({ texts }: LoadTextProps) => {
   );
 };
 
-export default LoadAnimatedText;
-
+export default memo(LoadAnimatedText)
