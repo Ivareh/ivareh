@@ -50,6 +50,16 @@ services:
     ports:
       - "5432:5432"
 
+  blob-storage:
+    restart: "no"
+    ports:
+      - "10000:10000"
+    build:
+      context: ./blob-storage
+      args:
+        AZURITE_VERSION: 3.33.0
+
+
   adminer:
     restart: "no"
     ports:
