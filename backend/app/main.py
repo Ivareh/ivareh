@@ -1,4 +1,4 @@
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 import sentry_sdk
 from fastapi import FastAPI
@@ -6,9 +6,9 @@ from fastapi.routing import APIRoute
 from starlette.middleware.cors import CORSMiddleware
 
 from app.api.main import api_router
+from app.core.config import settings
 from app.core.db import engine
 from app.core.models.database import Base
-from app.core.config import settings
 
 
 def custom_generate_unique_id(route: APIRoute) -> str:
@@ -20,7 +20,7 @@ if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
 
 
 # Create tables before the app start
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: ARG001
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
