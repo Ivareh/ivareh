@@ -10,7 +10,7 @@ from app.core.models.database import Base
 
 
 class Image(Base):
-    __tablename__ = "image"
+    __tablename__ = "images"
 
     id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), default=uuid.uuid4, primary_key=True

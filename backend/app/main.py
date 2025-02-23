@@ -20,7 +20,7 @@ if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
 
 
 # Create tables before the app start
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: ARG001
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
