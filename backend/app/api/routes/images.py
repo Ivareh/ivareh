@@ -14,4 +14,14 @@ router = crud_router(
     update_schema=ImageUpdate,
     path="/images",
     tags=["images"],
+    included_methods=["create", "read", "read_multi", "update", "delete"],
+    endpoint_names={
+        "create": "",
+        "read": "",
+        "update": "",
+        "delete": "",
+        "db_delete": "",
+        "read_multi": "",
+        "read_paginated": "",
+    },
 )
