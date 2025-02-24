@@ -83,7 +83,10 @@ if __name__ == "__main__":
         account_url="http://localhost:10000/devstoreaccount1",
         credential={
             "account_name": "devstoreaccount1",
-            "account_key": ("changethis"),
+            "account_key": (
+                "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq"
+                "/K1SZFPTOtr/KBHBeksoGMGw=="
+            ),
         },
     )
     print("Finished waiting and initialized Blob Service Client")
