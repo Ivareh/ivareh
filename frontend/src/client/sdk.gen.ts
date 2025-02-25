@@ -4,58 +4,36 @@ import type { CancelablePromise } from "./core/CancelablePromise"
 import { OpenAPI } from "./core/OpenAPI"
 import { request as __request } from "./core/request"
 import type {
-  ItemsReadItemsData,
-  ItemsReadItemsResponse,
-  ItemsCreateItemData,
-  ItemsCreateItemResponse,
-  ItemsReadItemData,
-  ItemsReadItemResponse,
-  ItemsUpdateItemData,
-  ItemsUpdateItemResponse,
-  ItemsDeleteItemData,
-  ItemsDeleteItemResponse,
+  EndpointApiV1ImagesPostData,
+  EndpointApiV1ImagesPostResponse,
+  EndpointApiV1ImagesGetData,
+  EndpointApiV1ImagesGetResponse,
+  EndpointApiV1ImagesIdGetData,
+  EndpointApiV1ImagesIdGetResponse,
+  EndpointApiV1ImagesIdPatchData,
+  EndpointApiV1ImagesIdPatchResponse,
+  EndpointApiV1ImagesIdDeleteData,
+  EndpointApiV1ImagesIdDeleteResponse,
+  UpsertMultipleImagesApiV1UpsertMultiImagesPostData,
+  UpsertMultipleImagesApiV1UpsertMultiImagesPostResponse,
+  HealthCheckApiV1UtilsHealthCheckGetResponse,
 } from "./types.gen"
 
-export class ItemsService {
+export class ImagesService {
   /**
-   * Read Items
-   * Retrieve items.
-   * @param data The data for the request.
-   * @param data.skip
-   * @param data.limit
-   * @returns ItemsPublic Successful Response
-   * @throws ApiError
-   */
-  public static readItems(
-    data: ItemsReadItemsData = {},
-  ): CancelablePromise<ItemsReadItemsResponse> {
-    return __request(OpenAPI, {
-      method: "GET",
-      url: "/api/v1/items/",
-      query: {
-        skip: data.skip,
-        limit: data.limit,
-      },
-      errors: {
-        422: "Validation Error",
-      },
-    })
-  }
-
-  /**
-   * Create Item
-   * Create new item.
+   * Endpoint
+   * Create a new Image row in the database.
    * @param data The data for the request.
    * @param data.requestBody
-   * @returns ItemPublic Successful Response
+   * @returns unknown Successful Response
    * @throws ApiError
    */
-  public static createItem(
-    data: ItemsCreateItemData,
-  ): CancelablePromise<ItemsCreateItemResponse> {
+  public static endpointApiV1ImagesPost(
+    data: EndpointApiV1ImagesPostData,
+  ): CancelablePromise<EndpointApiV1ImagesPostResponse> {
     return __request(OpenAPI, {
       method: "POST",
-      url: "/api/v1/items/",
+      url: "/api/v1/images",
       body: data.requestBody,
       mediaType: "application/json",
       errors: {
@@ -65,18 +43,53 @@ export class ItemsService {
   }
 
   /**
-   * Read Item
+   * Endpoint
+   * Read multiple Image rows from the database.
+   *
+   * - Use page & itemsPerPage for paginated results
+   * - Use offset & limit for specific ranges
+   * - Returns paginated response when using page/itemsPerPage
+   * - Returns simple list response when using offset/limit
    * @param data The data for the request.
-   * @param data.id
-   * @returns ItemPublic Successful Response
+   * @param data.offset Offset for unpaginated queries
+   * @param data.limit Limit for unpaginated queries
+   * @param data.page Page number
+   * @param data.itemsPerPage Number of items per page
+   * @returns unknown Successful Response
    * @throws ApiError
    */
-  public static readItem(
-    data: ItemsReadItemData,
-  ): CancelablePromise<ItemsReadItemResponse> {
+  public static endpointApiV1ImagesGet(
+    data: EndpointApiV1ImagesGetData = {},
+  ): CancelablePromise<EndpointApiV1ImagesGetResponse> {
     return __request(OpenAPI, {
       method: "GET",
-      url: "/api/v1/items/{id}",
+      url: "/api/v1/images",
+      query: {
+        offset: data.offset,
+        limit: data.limit,
+        page: data.page,
+        itemsPerPage: data.itemsPerPage,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+    })
+  }
+
+  /**
+   * Endpoint
+   * Read a single Image row from the database by its primary keys: ['id'].
+   * @param data The data for the request.
+   * @param data.id
+   * @returns unknown Successful Response
+   * @throws ApiError
+   */
+  public static endpointApiV1ImagesIdGet(
+    data: EndpointApiV1ImagesIdGetData,
+  ): CancelablePromise<EndpointApiV1ImagesIdGetResponse> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/v1/images/{id}",
       path: {
         id: data.id,
       },
@@ -87,20 +100,20 @@ export class ItemsService {
   }
 
   /**
-   * Update Item
-   * Update an item.
+   * Endpoint
+   * Update an existing Image row in the database by its primary keys: ['id'].
    * @param data The data for the request.
    * @param data.id
    * @param data.requestBody
-   * @returns ItemPublic Successful Response
+   * @returns unknown Successful Response
    * @throws ApiError
    */
-  public static updateItem(
-    data: ItemsUpdateItemData,
-  ): CancelablePromise<ItemsUpdateItemResponse> {
+  public static endpointApiV1ImagesIdPatch(
+    data: EndpointApiV1ImagesIdPatchData,
+  ): CancelablePromise<EndpointApiV1ImagesIdPatchResponse> {
     return __request(OpenAPI, {
-      method: "PUT",
-      url: "/api/v1/items/{id}",
+      method: "PATCH",
+      url: "/api/v1/images/{id}",
       path: {
         id: data.id,
       },
@@ -113,25 +126,61 @@ export class ItemsService {
   }
 
   /**
-   * Delete Item
-   * Delete an item.
+   * Endpoint
+   * Delete a Image row from the database by its primary keys: ['id'].
    * @param data The data for the request.
    * @param data.id
-   * @returns Message Successful Response
+   * @returns unknown Successful Response
    * @throws ApiError
    */
-  public static deleteItem(
-    data: ItemsDeleteItemData,
-  ): CancelablePromise<ItemsDeleteItemResponse> {
+  public static endpointApiV1ImagesIdDelete(
+    data: EndpointApiV1ImagesIdDeleteData,
+  ): CancelablePromise<EndpointApiV1ImagesIdDeleteResponse> {
     return __request(OpenAPI, {
       method: "DELETE",
-      url: "/api/v1/items/{id}",
+      url: "/api/v1/images/{id}",
       path: {
         id: data.id,
       },
       errors: {
         422: "Validation Error",
       },
+    })
+  }
+
+  /**
+   * Upsert Multiple Images
+   * Upsert multiple images at once
+   * @param data The data for the request.
+   * @param data.requestBody
+   * @returns unknown Successful Response
+   * @throws ApiError
+   */
+  public static upsertMultipleImagesApiV1UpsertMultiImagesPost(
+    data: UpsertMultipleImagesApiV1UpsertMultiImagesPostData,
+  ): CancelablePromise<UpsertMultipleImagesApiV1UpsertMultiImagesPostResponse> {
+    return __request(OpenAPI, {
+      method: "POST",
+      url: "/api/v1/upsert_multi_images",
+      body: data.requestBody,
+      mediaType: "application/json",
+      errors: {
+        422: "Validation Error",
+      },
+    })
+  }
+}
+
+export class UtilsService {
+  /**
+   * Health Check
+   * @returns boolean Successful Response
+   * @throws ApiError
+   */
+  public static healthCheckApiV1UtilsHealthCheckGet(): CancelablePromise<HealthCheckApiV1UtilsHealthCheckGetResponse> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/v1/utils/health-check/",
     })
   }
 }

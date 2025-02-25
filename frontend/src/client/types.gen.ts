@@ -4,29 +4,23 @@ export type HTTPValidationError = {
   detail?: Array<ValidationError>
 }
 
-export type ItemCreate = {
-  title: string
-  description?: string | null
+export type ImageCreate = {
+  title?: string | null
+  category: string
+  url: string
 }
 
-export type ItemPublic = {
-  title: string
-  description?: string | null
+export type ImagePublic = {
+  title?: string | null
+  category: string
+  url: string
   id: string
 }
 
-export type ItemsPublic = {
-  data: Array<ItemPublic>
-  count: number
-}
-
-export type ItemUpdate = {
+export type ImageUpdate = {
   title?: string | null
-  description?: string | null
-}
-
-export type Message = {
-  message: string
+  category: string
+  url: string
 }
 
 export type ValidationError = {
@@ -35,34 +29,57 @@ export type ValidationError = {
   type: string
 }
 
-export type ItemsReadItemsData = {
-  limit?: number
-  skip?: number
+export type EndpointApiV1ImagesPostData = {
+  requestBody: ImageCreate
 }
 
-export type ItemsReadItemsResponse = ItemsPublic
+export type EndpointApiV1ImagesPostResponse = unknown
 
-export type ItemsCreateItemData = {
-  requestBody: ItemCreate
+export type EndpointApiV1ImagesGetData = {
+  /**
+   * Number of items per page
+   */
+  itemsPerPage?: number | null
+  /**
+   * Limit for unpaginated queries
+   */
+  limit?: number | null
+  /**
+   * Offset for unpaginated queries
+   */
+  offset?: number | null
+  /**
+   * Page number
+   */
+  page?: number | null
 }
 
-export type ItemsCreateItemResponse = ItemPublic
+export type EndpointApiV1ImagesGetResponse = unknown
 
-export type ItemsReadItemData = {
+export type EndpointApiV1ImagesIdGetData = {
   id: string
 }
 
-export type ItemsReadItemResponse = ItemPublic
+export type EndpointApiV1ImagesIdGetResponse = unknown
 
-export type ItemsUpdateItemData = {
+export type EndpointApiV1ImagesIdPatchData = {
   id: string
-  requestBody: ItemUpdate
+  requestBody: ImageUpdate
 }
 
-export type ItemsUpdateItemResponse = ItemPublic
+export type EndpointApiV1ImagesIdPatchResponse = unknown
 
-export type ItemsDeleteItemData = {
+export type EndpointApiV1ImagesIdDeleteData = {
   id: string
 }
 
-export type ItemsDeleteItemResponse = Message
+export type EndpointApiV1ImagesIdDeleteResponse = unknown
+
+export type UpsertMultipleImagesApiV1UpsertMultiImagesPostData = {
+  requestBody: Array<ImageCreate>
+}
+
+export type UpsertMultipleImagesApiV1UpsertMultiImagesPostResponse =
+  Array<ImagePublic> | null
+
+export type HealthCheckApiV1UtilsHealthCheckGetResponse = boolean
