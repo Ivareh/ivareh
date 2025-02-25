@@ -48,9 +48,10 @@ async def upsert_multiple_images(
             instances=images,
             schema_to_select=ImagePublic,
             return_as_model=True,
+            commit=True,
         )
-        if not imgs:
-            raise ValueError("No images provided")
+        if imgs is None:
+            raise HTTPException(status_code=400, detail="No images provided")
         return imgs["data"]
     except Exception as e:
         raise HTTPException(
