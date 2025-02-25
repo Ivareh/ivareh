@@ -42,26 +42,6 @@ services:
       - traefik.http.routers.${STACK_NAME?Variable not set}-adminer-https.tls.certresolver=le
       - traefik.http.services.${STACK_NAME?Variable not set}-adminer.loadbalancer.server.port=8080
 
-  blob-storage:
-    image: '${DOCKER_IMAGE_BLOB_STORAGE?Variable not set}:${TAG-latest}'
-    restart: always
-    depends_on:
-      - db
-    env_file:
-      - .env
-    environment:
-      - AZURITE_VERSION=${AZURITE_VERSION}
-      - AZURITE_ACCOUNT_NAME=${AZURITE_ACCOUNT_NAME}
-      - AZURITE_ACCOUNT_KEY=${AZURITE_ACCOUNT_KEY}
-      - AZURITE_CONNECTION_STRING=${AZURITE_CONNECTION_STRING}
-    volumes:
-      - app-blob-data:/opt/azurite
-    build:
-      context: ./blob-storage
-      args:
-        AZURITE_VERSION: 3.33.0
-
-
 
   backend:
     image: '${DOCKER_IMAGE_BACKEND?Variable not set}:${TAG-latest}'
@@ -117,6 +97,27 @@ services:
 
       # Enable redirection for HTTP and HTTPS
       - traefik.http.routers.${STACK_NAME?Variable not set}-backend-http.middlewares=https-redirect
+
+  blob-storage:
+    image: '${DOCKER_IMAGE_BLOB_STORAGE?Variable not set}:${TAG-latest}'
+    restart: always
+    depends_on:
+      - db
+      - backend
+    env_file:
+      - .env
+    environment:
+      - AZURITE_VERSION=${AZURITE_VERSION}
+      - AZURITE_ACCOUNT_NAME=${AZURITE_ACCOUNT_NAME}
+      - AZURITE_ACCOUNT_KEY=${AZURITE_ACCOUNT_KEY}
+      - AZURITE_CONNECTION_STRING=${AZURITE_CONNECTION_STRING}
+    volumes:
+      - app-blob-data:/opt/azurite
+    build:
+      context: ./blob-storage
+      args:
+        AZURITE_VERSION: 3.33.0
+
 
   frontend:
     image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'

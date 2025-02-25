@@ -9,13 +9,14 @@ from app.core.config import settings
 from app.core.db import engine
 from app.core.models.database import Base
 
-
 if settings.SENTRY_DSN and settings.ENVIRONMENT != "local":
     sentry_sdk.init(dsn=str(settings.SENTRY_DSN), enable_tracing=True)
 
 
 # Create tables before the app start
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+async def lifespan(
+    app: FastAPI,  # noqa: ARG001
+) -> AsyncGenerator[None, None]:
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield

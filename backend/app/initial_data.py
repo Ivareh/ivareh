@@ -1,7 +1,5 @@
 import logging
 
-from sqlmodel import Session
-
 from app.core.db import engine
 
 logging.basicConfig(level=logging.INFO)
@@ -9,7 +7,7 @@ logger = logging.getLogger(__name__)
 
 
 def init() -> None:
-    with Session(engine) as session:
+    with engine.begin() as session:  # noqa: ARG001
         pass
 
 

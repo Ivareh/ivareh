@@ -11,6 +11,7 @@ from app.core.schemas.image import (
     ImagePublic,
     ImageUpdate,
 )
+from app.exceptions import DbObjectAlreadyExistsError, IvarehAPIError
 
 image_crud = FastCRUD(model_Image)
 
@@ -54,6 +55,10 @@ async def upsert_multiple_images(
             raise HTTPException(status_code=400, detail="No images provided")
         return imgs["data"]
     except Exception as e:
-        raise HTTPException(
-            status_code=500, detail=f"Error processing images: {e}"
-        ) from e
+        reason = str(e.args[0])
+        if "duplicate key value violates unique constraint" in reason:
+            raise DbObjectAlreadyExistsError(
+                model_table_name="images",
+            )
+        else:
+            raise IvarehAPIError
