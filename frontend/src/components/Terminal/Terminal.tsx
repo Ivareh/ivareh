@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react"
-import {v4 as uuidv4} from "uuid"
+import { v4 as uuidv4 } from "uuid"
 
-import { Grid } from "@chakra-ui/react"
+import { Box } from "@chakra-ui/react"
 
 import TerminalPrompter from "./TerminalPrompter"
 import LoadAnimatedText, { Text } from "../Terminal/Animation/LoadAnimatedText"
+import LoadAnimatedImages from "../Terminal/Animation/LoadAnimatedImages"
 import commands from "../Terminal/Commands"
 
 const Terminal = () => {
@@ -38,19 +39,22 @@ Welcome to my terminal.
 
       setTextsToGen((prev) => [...prev, { text: commands[latestPrompt], speed: "fast" }])
       if (latestPrompt === "clear") {
-        setTextsToGen([{text: "", speed: "fast"}])
+        setTextsToGen([{ text: "", speed: "fast" }])
         setTermKey(uuidv4())
       }
     }
   }, [prompt])
 
   return (
-    <Grid p={1} borderColor="ui.tmuxBorder" borderWidth={"1px"} key={termKey} >
+    <Box height="auto" p={1} borderColor="ui.tmuxBorder" borderWidth={"1px"} key={termKey} >
       <LoadAnimatedText setProcessingPrompt={setProcessingPrompt} texts={textsToGen} />
-      {!processingPrompt &&
-        <TerminalPrompter setPrompt={setPrompt} />
-      }
-    </Grid>
+      <TerminalPrompter
+        setPrompt={setPrompt}
+        style={{ visibility: processingPrompt ? 'hidden' : 'visible' }}
+        key={processingPrompt ? "hidden" : "visible"}
+      />
+      <LoadAnimatedImages setProcessingPrompt={setProcessingPrompt} images={null} />
+    </Box>
   )
 }
 

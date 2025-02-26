@@ -1,16 +1,16 @@
 import { useState, memo } from "react"
 
-import { Flex, Textarea } from "@chakra-ui/react"
+import { Flex, FlexProps, Textarea } from "@chakra-ui/react"
 
 import { BlockyPurpleArrow } from "../Common/Icon"
 import { randomIntFromInterval } from "./Utils"
 
 
-interface TerminalPrompterProps {
+interface TerminalPrompterProps extends FlexProps{
   setPrompt: (prompt: string) => void
 }
 
-const TerminalPrompter = ({ setPrompt }: TerminalPrompterProps) => {
+const TerminalPrompter = ({ setPrompt, ...props }: TerminalPrompterProps) => {
   const [currentText, setCurrentText] = useState<string>();
   const [currentPrompt, setCurrentPrompt] = useState<string>(); // Controls value on hit enter
   const [promptFocus, setPromptFocus] = useState<Boolean>(false);
@@ -30,7 +30,7 @@ const TerminalPrompter = ({ setPrompt }: TerminalPrompterProps) => {
 
 
   return (
-    <Flex maxH="400px" borderWidth={1} color="white" >
+    <Flex maxH="400px" borderWidth={1} color="white" {...props} >
       <BlockyPurpleArrow m={1} />
       <Textarea
         value={currentText}

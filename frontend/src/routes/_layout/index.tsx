@@ -11,7 +11,7 @@ function Dashboard() {
 
   return (
     <>
-      <Container maxW="full" >
+      <Container maxW="full" overflowY="auto">
         <Box pt={12}>
           <Text className="loadText" as="pre" color="white" fontSize="md" fontFamily="monospace">
             {String.raw`

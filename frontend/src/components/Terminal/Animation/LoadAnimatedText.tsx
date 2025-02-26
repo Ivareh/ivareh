@@ -18,7 +18,7 @@ interface LoadTextProps {
 
 const LoadAnimatedText = ({ texts, setProcessingPrompt }: LoadTextProps) => {
   const [animated, setAnimated] = useState<Set<number>>(new Set<number>([]))
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const tl = useRef<gsap.core.Timeline>();
 
   useGSAP(() => {
@@ -52,6 +52,11 @@ const LoadAnimatedText = ({ texts, setProcessingPrompt }: LoadTextProps) => {
     if (tl.current && tl.current.isActive()) {
       setProcessingPrompt(tl.current.isActive())
     }
+
+    if (containerRef.current) {
+      // Scroll to the bottom of the container
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
   }, [tl.current])
 
   const renderText = (text: Text, textIndex: number) => {
@@ -76,7 +81,7 @@ const LoadAnimatedText = ({ texts, setProcessingPrompt }: LoadTextProps) => {
   };
 
   return (
-    <Flex color="white" flexDirection="column" ref={containerRef}>
+    <Flex maxH={200} overflowY="auto" scrollBehavior="smooth" color="white" flexDirection="column" ref={containerRef}>
       {texts.map((text, textIndex) => (
         <div key={textIndex}>
           {renderText(text, textIndex)}
