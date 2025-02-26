@@ -115,5 +115,8 @@ class Settings(BaseSettings):
 
         return self
 
+    AZURITE_ACCOUNT_NAME: str
+    AZURITE_ACCOUNT_KEY: str
+
 
 settings = Settings()  # type: ignore
