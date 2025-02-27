@@ -6,7 +6,8 @@ RUN apk update && \
     apk --no-cache add py3-pip && \
     apk add --virtual=build gcc libffi-dev musl-dev python3-dev && \
     pip3 install --upgrade pip && \
-    pip3 install azure-storage-blob==12.12.0
+    pip3 install azure-storage-blob==12.12.0 && \
+    pip3 install pillow exifread
 
 # Copy initialization scripts and container data
 COPY ./init_azurite.py init_azurite.py

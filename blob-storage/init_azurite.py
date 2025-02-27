@@ -2,18 +2,40 @@ import argparse
 import os
 from time import sleep
 
+from PIL import Image
+import exifread
+
 from azure.core.exceptions import ResourceExistsError
 from azure.storage.blob import BlobServiceClient, ContainerClient
 
 
+OBJ_IGNORE_LIST = set([".gitkeep"])
+
+
 def upload_file(container_client: ContainerClient, source: str, dest: str) -> None:
-    """
-    Upload a single file to a path inside the container.
-    """
     print(f"Uploading {source} to {dest}")
+    # Extract metadata from the image
+    metadata = {}
+    with open(source, "rb") as file:
+        # Get width and height using Pillow
+        img = Image.open(file)
+        width, height = img.size
+        metadata["width"] = str(width)
+        metadata["height"] = str(height)
+
+        # Reset file pointer for EXIF reading
+        file.seek(0)
+        tags = exifread.process_file(file, details=False)
+        datetime_original = tags.get("EXIF DateTimeOriginal")
+        if datetime_original:
+            metadata["captured_time"] = str(datetime_original)
+
+    # Upload the blob with metadata
     with open(source, "rb") as data:
         try:
-            container_client.upload_blob(name=dest, data=data)
+            container_client.upload_blob(
+                name=dest, data=data, metadata=metadata, overwrite=True
+            )
         except ResourceExistsError:
             pass
 
@@ -26,6 +48,8 @@ def upload_dir(container_client: ContainerClient, source: str, dest: str) -> Non
     prefix += os.path.basename(source) + "/"
     for root, dirs, files in os.walk(source):
         for name in files:
+            if name in OBJ_IGNORE_LIST:
+                continue
             dir_part = os.path.relpath(root, source)
             dir_part = "" if dir_part == "." else dir_part + "/"
             file_path = os.path.join(root, name)

@@ -1,11 +1,11 @@
+from datetime import datetime
+
 from requests import Response, post, HTTPError
 import argparse
 import os
 
 from azure.storage.blob import BlobServiceClient, BlobProperties
 from azure.core.paging import ItemPaged
-
-OBJ_IGNORE_LIST = set([".gitkeep"])
 
 
 def send_data(api_url: str, json_data: list[dict[str, str]]) -> Response | None:
@@ -29,14 +29,21 @@ def create_api_objects(
 ) -> list[dict[str, str]]:
     data_l = []
     for blob in blob_list:
+        metadata = blob.metadata or {}
+        if not metadata:
+            raise Exception(f"No metadata found for blob {blob.name}")
+        formatted_cap_time = datetime.strptime(
+            metadata.get("captured_time"), "%Y:%m:%d %H:%M:%S"
+        )
         img_type, _, title = blob.name.partition("/")
-        if title in OBJ_IGNORE_LIST:
-            continue
         url = f"{account_url}/{container_name}/{blob.name}"
         obj = {
             "title": title,
             "category": img_type,
             "url": url,
+            "width": metadata.get("width"),
+            "height": metadata.get("height"),
+            "captured_time": formatted_cap_time.isoformat(),
         }
         data_l.append(obj)
     return data_l
@@ -82,7 +89,7 @@ if __name__ == "__main__":
             for container_name in os.listdir(containers_directory):
                 blob_list = blob_service_client.get_container_client(
                     container_name
-                ).list_blobs()
+                ).list_blobs(include=["metadata"])
                 data = create_api_objects(blob_list, container_name, account_url)
                 send_data(api_url=api_url, json_data=data)
         print("Finished creating and sending API objects")
