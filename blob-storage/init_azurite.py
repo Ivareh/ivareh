@@ -2,7 +2,7 @@ import argparse
 import os
 from time import sleep
 
-from PIL import Image
+from PIL import Image, ImageOps
 import exifread
 
 from azure.core.exceptions import ResourceExistsError
@@ -12,14 +12,38 @@ from azure.storage.blob import BlobServiceClient, ContainerClient
 OBJ_IGNORE_LIST = set([".gitkeep"])
 
 
+def get_correct_dimensions(img):
+    """
+    Returns (width, height) adjusted for EXIF orientation.
+    """
+    width, height = img.width, img.height
+
+    try:
+        # Check EXIF orientation tag (if it exists)
+        exif = img.getexif()
+        orientation = exif.get(274)  # 274 is the EXIF tag for orientation
+
+        # Swap dimensions for orientations that require 90/270 degree rotation
+        if orientation in [6, 8]:
+            width, height = height, width
+
+    except Exception as e:
+        print(f"Error reading EXIF: {e}")
+
+    return width, height
+
+
 def upload_file(container_client: ContainerClient, source: str, dest: str) -> None:
     print(f"Uploading {source} to {dest}")
-    # Extract metadata from the image
     metadata = {}
+
     with open(source, "rb") as file:
-        # Get width and height using Pillow
+        # Read image with Pillow and auto-rotate based on EXIF
         img = Image.open(file)
-        width, height = img.size
+        img = ImageOps.exif_transpose(img)  # Auto-rotate image if needed
+
+        # Get corrected dimensions
+        width, height = get_correct_dimensions(img)
         metadata["width"] = str(width)
         metadata["height"] = str(height)
 
