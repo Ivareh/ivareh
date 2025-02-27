@@ -20,7 +20,7 @@ interface LoadTextProps {
 const getImagesQuery = () => {
   return {
     queryFn: () =>
-      ImagesService.endpointApiV1ImagesGet(),
+      ImagesService.getMultiImagesApiV1GetMultiImagesGet(),
     queryKey: ["items"],
   }
 }
@@ -36,10 +36,6 @@ const LoadAnimatedImages = ({ images, setProcessingPrompt }: LoadTextProps) => {
     placeholderData: (prevData) => prevData,
   })
 
-  const imgData = (data as { data: ImagePublic[] })?.data;
-
-
-  console.log(data)
 
   useGSAP(() => {
     tl.current = gsap.timeline({
@@ -62,35 +58,41 @@ const LoadAnimatedImages = ({ images, setProcessingPrompt }: LoadTextProps) => {
   }, { dependencies: [images], scope: containerRef });
 
   useEffect(() => {
-    console.log(imgData?.[0]?.url)
     if (tl.current && tl.current.isActive()) {
       setProcessingPrompt(tl.current.isActive())
-
     }
   }, [tl.current])
 
+  function getSpanEstimate(size: number) {
+    if (size > 3000) {
+      return 2
+    }
 
-  // Construct image URL
-  const imageUrl = `${imgData?.[0]?.url}?se=2025-02-26T13%3A22%3A25Z&sp=r&sv=2025-01-05&sr=c&sig=QIzPZngICJV2v0TRx/YpZlZtyqI/NjMSOtQBAXHm55A%3D`;
-
-  const gridTemplateLargeScreens = `
-    "a b c"
-    "a b c"
-    "a b c"
-    "d b f"
-    "d b f"
-    "d e f"
-    "d e f"
-    "g h i"
-    "g h i"
-    "g h j"
-  `
+    return 1
+  }
 
 
-  const renderImage = () => {
+  const renderImage = (image: ImagePublic, key: number) => {
+    const style = {
+      gridColumnEnd: `span ${getSpanEstimate(image.width)}`,
+      gridRowEnd: `span 1`,
+    };
+
+    const imageUrl = `${image.url}?se=2025-02-27T13%3A51%3A59Z&sp=r&sv=2025-01-05&sr=c&sig=VPD/6Q6DHGFn7hY%2BQIKEvT40n3Kh8hrkWJip71OrcXc%3D`;
+
     return (
-      <GridItem gridArea="a">
-        <Image src={imageUrl} alt="new" />
+      <GridItem style={style} key={key} minWidth="260px"> {/* Add minWidth here */}
+        <Image
+          src={imageUrl}
+          alt={`Image ${key} of ${image.category}`}
+          objectFit="cover"
+          sx={{
+            minWidth: '259px', // Fallback for min-width
+            'img': {
+              minWidth: '259px',
+            }
+          }}
+        />
       </GridItem>
     )
   };
@@ -99,14 +101,14 @@ const LoadAnimatedImages = ({ images, setProcessingPrompt }: LoadTextProps) => {
     <Grid
       width="100%"
       height="100%"
-      gridTemplateColumns="repeat(3, minmax(360px, 1fr))"
-      gridTemplateRows="repeat(10, minmax(60px, 1fr))"
-      gridTemplateAreas={gridTemplateLargeScreens}
-      gap="1.5rem"
+      gridTemplateColumns="repeat(auto-fill, minmax(260px, 1fr))" // Ensure column min-width
+      gridTemplateRows="repeat(auto-fit, minmax(260px, auto))" // Add row min-height
+      gridAutoFlow="row dense"
+      gap="1.8rem"
       color="white"
       bgColor="ui.main"
       ref={containerRef}>
-      {renderImage()}
+      {data && data.map((image, index) => renderImage(image, index))}
     </Grid>
   );
 };

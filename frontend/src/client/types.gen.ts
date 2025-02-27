@@ -8,12 +8,18 @@ export type ImageCreate = {
   title?: string | null
   category: string
   url: string
+  width: number
+  height: number
+  captured_time: string
 }
 
 export type ImagePublic = {
   title?: string | null
   category: string
   url: string
+  width: number
+  height: number
+  captured_time: string
   id: string
 }
 
@@ -21,6 +27,9 @@ export type ImageUpdate = {
   title?: string | null
   category: string
   url: string
+  width: number
+  height: number
+  captured_time: string
 }
 
 export type ValidationError = {
@@ -34,27 +43,6 @@ export type EndpointApiV1ImagesPostData = {
 }
 
 export type EndpointApiV1ImagesPostResponse = unknown
-
-export type EndpointApiV1ImagesGetData = {
-  /**
-   * Number of items per page
-   */
-  itemsPerPage?: number | null
-  /**
-   * Limit for unpaginated queries
-   */
-  limit?: number | null
-  /**
-   * Offset for unpaginated queries
-   */
-  offset?: number | null
-  /**
-   * Page number
-   */
-  page?: number | null
-}
-
-export type EndpointApiV1ImagesGetResponse = unknown
 
 export type EndpointApiV1ImagesIdGetData = {
   id: string
@@ -82,4 +70,16 @@ export type UpsertMultipleImagesApiV1UpsertMultiImagesPostData = {
 export type UpsertMultipleImagesApiV1UpsertMultiImagesPostResponse =
   Array<ImagePublic> | null
 
+export type GetMultiImagesApiV1GetMultiImagesGetData = {
+  limit?: number | null
+  offset?: number
+  sortColumns?: Array<string> | null
+  sortOrders?: Array<string> | null
+}
+
+export type GetMultiImagesApiV1GetMultiImagesGetResponse =
+  Array<ImagePublic> | null
+
 export type HealthCheckApiV1UtilsHealthCheckGetResponse = boolean
+
+export type GetContainerSasApiV1UtilsContainerSasTokenGetResponse = string

@@ -6,8 +6,6 @@ import { request as __request } from "./core/request"
 import type {
   EndpointApiV1ImagesPostData,
   EndpointApiV1ImagesPostResponse,
-  EndpointApiV1ImagesGetData,
-  EndpointApiV1ImagesGetResponse,
   EndpointApiV1ImagesIdGetData,
   EndpointApiV1ImagesIdGetResponse,
   EndpointApiV1ImagesIdPatchData,
@@ -16,7 +14,10 @@ import type {
   EndpointApiV1ImagesIdDeleteResponse,
   UpsertMultipleImagesApiV1UpsertMultiImagesPostData,
   UpsertMultipleImagesApiV1UpsertMultiImagesPostResponse,
+  GetMultiImagesApiV1GetMultiImagesGetData,
+  GetMultiImagesApiV1GetMultiImagesGetResponse,
   HealthCheckApiV1UtilsHealthCheckGetResponse,
+  GetContainerSasApiV1UtilsContainerSasTokenGetResponse,
 } from "./types.gen"
 
 export class ImagesService {
@@ -36,40 +37,6 @@ export class ImagesService {
       url: "/api/v1/images",
       body: data.requestBody,
       mediaType: "application/json",
-      errors: {
-        422: "Validation Error",
-      },
-    })
-  }
-
-  /**
-   * Endpoint
-   * Read multiple Image rows from the database.
-   *
-   * - Use page & itemsPerPage for paginated results
-   * - Use offset & limit for specific ranges
-   * - Returns paginated response when using page/itemsPerPage
-   * - Returns simple list response when using offset/limit
-   * @param data The data for the request.
-   * @param data.offset Offset for unpaginated queries
-   * @param data.limit Limit for unpaginated queries
-   * @param data.page Page number
-   * @param data.itemsPerPage Number of items per page
-   * @returns unknown Successful Response
-   * @throws ApiError
-   */
-  public static endpointApiV1ImagesGet(
-    data: EndpointApiV1ImagesGetData = {},
-  ): CancelablePromise<EndpointApiV1ImagesGetResponse> {
-    return __request(OpenAPI, {
-      method: "GET",
-      url: "/api/v1/images",
-      query: {
-        offset: data.offset,
-        limit: data.limit,
-        page: data.page,
-        itemsPerPage: data.itemsPerPage,
-      },
       errors: {
         422: "Validation Error",
       },
@@ -169,6 +136,35 @@ export class ImagesService {
       },
     })
   }
+
+  /**
+   * Get Multi Images
+   * Read multiple images at once
+   * @param data The data for the request.
+   * @param data.limit
+   * @param data.offset
+   * @param data.sortColumns
+   * @param data.sortOrders
+   * @returns unknown Successful Response
+   * @throws ApiError
+   */
+  public static getMultiImagesApiV1GetMultiImagesGet(
+    data: GetMultiImagesApiV1GetMultiImagesGetData = {},
+  ): CancelablePromise<GetMultiImagesApiV1GetMultiImagesGetResponse> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/v1/get_multi_images",
+      query: {
+        limit: data.limit,
+        offset: data.offset,
+        sort_columns: data.sortColumns,
+        sort_orders: data.sortOrders,
+      },
+      errors: {
+        422: "Validation Error",
+      },
+    })
+  }
 }
 
 export class UtilsService {
@@ -181,6 +177,18 @@ export class UtilsService {
     return __request(OpenAPI, {
       method: "GET",
       url: "/api/v1/utils/health-check/",
+    })
+  }
+
+  /**
+   * Get Container Sas
+   * @returns string Successful Response
+   * @throws ApiError
+   */
+  public static getContainerSasApiV1UtilsContainerSasTokenGet(): CancelablePromise<GetContainerSasApiV1UtilsContainerSasTokenGetResponse> {
+    return __request(OpenAPI, {
+      method: "GET",
+      url: "/api/v1/utils/container-sas-token/",
     })
   }
 }
