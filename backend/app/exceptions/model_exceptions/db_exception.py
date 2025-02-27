@@ -26,7 +26,7 @@ class _DBErrorLogBase(IvarehAPIError):
         )
 
 
-class DbObjectAlreadyExistsError(_DBErrorLogBase):
+class DBObjAlreadyExistsError(_DBErrorLogBase):
     """Exception raised for db object already exists errors."""
 
     def __init__(

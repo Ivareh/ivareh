@@ -1,6 +1,11 @@
-from pydantic import (
-    BaseModel,
-)
+from pydantic import BaseModel, Field
+
+
+class FilterParams(BaseModel):
+    limit: int | None = Field(None, gt=0)
+    offset: int = Field(0, ge=0)
+    sort_columns: list[str] | None = Field(None)
+    sort_orders: list[str] | None = Field(None)
 
 
 # JSON payload containing access token
