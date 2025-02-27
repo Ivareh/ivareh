@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
@@ -10,6 +11,9 @@ class _BaseImage(BaseModel):
     title: str | None = None
     category: str
     url: str
+    width: int
+    height: int
+    captured_time: datetime
 
 
 class ImageCreate(_BaseImage):
