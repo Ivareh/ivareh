@@ -100,7 +100,7 @@ const LoadAnimatedImages = ({ filterParams, setProcessingPrompt }: LoadImageProp
           className={`image-${key}`}
           src={imageUrl}
           alt={`Image ${key} of ${image.category}`}
-          minW={"180px"}
+          minW={["160px", "200px", "260px"]}
         />
         <Text> Baked: {formatReaderFriendTime(image.captured_time)} </Text>
       </GridItem>
@@ -110,10 +110,10 @@ const LoadAnimatedImages = ({ filterParams, setProcessingPrompt }: LoadImageProp
   return (
     <Grid
       ref={containerRef}
-      gridTemplateColumns={{ base: "1fr", md: "repeat(auto-fill, minmax(220px, 1fr))" }}
-      gridTemplateRows="repeat(auto-fit, minmax(200px, auto))"
+      gridTemplateColumns={{ base: "1fr", md: "repeat(auto-fill, minmax(260px, 1fr))" }}
+      gridTemplateRows={["repeat(auto-fit, minmax(180px, auto))", "repeat(auto-fit, minmax(220px, auto))", "repeat(auto-fit, minmax(260px, auto))"]}
       gridAutoFlow="row dense"
-      gap="1.8rem"
+      gap={["0.5rem", "1rem", "1.8rem"]}
       color="white"
       bgColor="ui.main"
     >

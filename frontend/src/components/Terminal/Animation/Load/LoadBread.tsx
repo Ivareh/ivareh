@@ -18,7 +18,7 @@ const LoadBread = ({ setProcessingPrompt }: LoadBreadProps) => {
 
   const breadText: Text[] = [{
     text:
-`These are the sourdough bread I have created so far!
+      `These are the sourdough bread I have created so far!
 I started making sourdough bread in the summer of 2024 :)
     `, duration: 0.03, stagger: 0.03
   }]
@@ -27,11 +27,10 @@ I started making sourdough bread in the summer of 2024 :)
     <>
       <LoadAnimatedText
         texts={breadText}
-        bgGradient="linear(to-r, #FFFF00, #FFB300)" // Even more vibrant gradient from pure yellow to vivid amber
-        bgClip="text"
-        fontSize={["2xl", "4xl"]}
-        fontWeight="extrabold"
-        textShadow="2px 2px 4px rgba(0, 0, 0, 0.6)"
+        fontSize={["x-large", "xx-large", "xxx-large"]}
+        fontWeight="bold"
+        color="yellow.400"
+        textAlign={["center", "center", "left"]}
         mb={4}
         setProcessingPrompt={setProcessingPrompt}
       />

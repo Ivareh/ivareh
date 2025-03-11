@@ -4,6 +4,7 @@ import { Box } from "@chakra-ui/react"
 import TerminalPrompter from "./TerminalPrompter"
 import LoadAnimatedText, { Text } from "../Terminal/Animation/LoadAnimatedText"
 import LoadBread from "../Terminal/Animation/Load/LoadBread"
+import LoadProjects from "../Terminal/Animation/Load/LoadProjects"
 import { genTextCommands, genContentCommands } from "../Terminal/Commands"
 
 type State = { [key: string]: boolean };
@@ -54,6 +55,7 @@ Welcome to my terminal.
       const genText = latestPrompt in genTextCommands
 
       if (genContentCommands.has(latestPrompt)) {
+        dispatch({ key: "reset", load: false })
         dispatch({ key: latestPrompt, load: true })
       }
 
@@ -75,7 +77,7 @@ Welcome to my terminal.
   }, [prompt]) // Removed ref from dependencies as it's not needed
 
   return (
-    <Box height="auto" p={1} borderColor="ui.tmuxBorder" borderWidth={"1px"} >
+    <Box height="auto" p={1} >
       <Box
         ref={termAnimTextContainer}
         maxH={200}
@@ -87,13 +89,16 @@ Welcome to my terminal.
       >
         <LoadAnimatedText setProcessingPrompt={setProcessingPrompt} texts={textsToGen} />
       </Box>
-      {!processingPrompt && <TerminalPrompter
+      {<TerminalPrompter
+        visibility={processingPrompt ? "hidden" : undefined}
         setPrompt={setPrompt}
         style={{ visibility: processingPrompt ? 'hidden' : 'visible' }}
         key={termKey + "tp"}
+        mb="1rem"
       />
       }
       {contentState["bread"] && <LoadBread setProcessingPrompt={setProcessingPrompt} />}
+      {contentState["projects"] && <LoadProjects setProcessingPrompt={setProcessingPrompt} />}
     </Box>
   )
 }

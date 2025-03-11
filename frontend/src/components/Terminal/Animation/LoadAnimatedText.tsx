@@ -2,12 +2,13 @@
 import { useRef, useState, useEffect, memo } from "react"
 import gsap from "gsap"
 import { useGSAP } from "@gsap/react"
-import { Box, Text, TextProps } from "@chakra-ui/react"
+import { Box, Text, TextProps, Link } from "@chakra-ui/react"
 
 export interface Text {
   text: string
   duration: number
   stagger: number
+  styles?: TextProps
 }
 
 interface LoadTextProps extends TextProps {
@@ -54,8 +55,10 @@ const LoadAnimatedText = ({ texts, setProcessingPrompt, ...props }: LoadTextProp
 
   const renderText = (text: Text, textIndex: number) => {
     const className = `loadText-${textIndex}`
+    const urlRegex = /(https?:\/\/[^\s]+)/
+    // Process each line (split by newline)
     return text.text.split("\n").map((line, lineIndex) => {
-      // Split line into words and spaces while preserving original spacing
+      // Split line into tokens (words and spaces) preserving whitespace
       const tokens = line.split(/(\s+)/).filter(t => t !== "")
 
       return (
@@ -63,11 +66,12 @@ const LoadAnimatedText = ({ texts, setProcessingPrompt, ...props }: LoadTextProp
           key={`${textIndex}-${lineIndex}`}
           whiteSpace="pre-wrap"
           display="block"
+          {...text.styles}
           {...props}
         >
           {tokens.map((token, tokenIndex) => {
+            // If token is just whitespace, preserve it.
             if (/\s/.test(token)) {
-              // Render preserved whitespace
               return (
                 <Text
                   as="span"
@@ -78,7 +82,28 @@ const LoadAnimatedText = ({ texts, setProcessingPrompt, ...props }: LoadTextProp
                 </Text>
               )
             }
-            // Render word with characters
+            // If token is a URL, wrap it in a Link and iterate over its characters.
+            if (urlRegex.test(token)) {
+              return (
+                <Link
+                  key={`${textIndex}-${lineIndex}-link-${tokenIndex}`}
+                  href={token}
+                  color="teal.500"
+                  isExternal
+                >
+                  {token.split("").map((char, charIndex) => (
+                    <Text
+                      key={`${textIndex}-${lineIndex}-link-${tokenIndex}-char-${charIndex}`}
+                      className={className}
+                      as="span"
+                    >
+                      {char}
+                    </Text>
+                  ))}
+                </Link>
+              )
+            }
+            // Otherwise, render the word character by character.
             return (
               <Text
                 as="span"
