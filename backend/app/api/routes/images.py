@@ -1,12 +1,9 @@
-from typing import Annotated
-
-from fastapi import Depends, HTTPException, Query
+from fastapi import Depends, HTTPException
 from fastcrud import FastCRUD, crud_router
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db
 from app.core.models.models import Image as model_Image
-from app.core.schemas.api import FilterParams
 from app.core.schemas.image import (
     ImageCreate,
     ImagePublic,
@@ -62,22 +59,31 @@ async def upsert_multiple_images(
             raise IvarehAPIError(detail=reason)
 
 
-@router.get(
+@router.post(
     "/get_multi_images", response_model=list[ImagePublic] | None, tags=["images"]
 )
 async def get_multi_images(
-    filter_params: Annotated[FilterParams, Query()], db: AsyncSession = Depends(get_db)
+    filter: dict[str, str] | None = None,
+    limit: int | None = None,
+    sort_columns: list[str] | None = None,
+    sort_orders: list[str] | None = None,
+    offset: int = 0,
+    db: AsyncSession = Depends(get_db),
 ) -> list[ImagePublic] | None:
     """Read multiple images at once"""
+    if sort_orders is None:
+        sort_orders = ["desc"]
     try:
         imgs = await image_crud.get_multi(
             db,
-            offset=filter_params.offset,
-            limit=filter_params.limit,
-            sort_columns=filter_params.sort_columns,
-            sort_orders=filter_params.sort_orders,
+            offset=offset,
+            limit=limit,
+            sort_columns=sort_columns,
+            sort_orders=sort_orders,
             schema_to_select=ImagePublic,
             return_as_model=True,
+            return_total_count=True,
+            **(filter or {}),
         )
 
         return imgs["data"]  # type: ignore
