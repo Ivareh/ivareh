@@ -11,9 +11,33 @@ function Dashboard() {
 
   return (
     <>
-      <Container maxW="full" overflowY="auto">
+      <Container maxW="full" w="full" overflowY="auto">
         <Box pt={12}>
-          <Text className="loadText" as="pre" color="white" fontSize="md" fontFamily="monospace">
+          <Text
+            justifySelf={"center"}
+            as="pre"
+            color="white"
+            fontSize="md"
+            fontFamily="monospace"
+            display={{ base: "block", md: "none" }}
+          >
+            {String.raw`
+██╗██╗   ██╗ █████╗ ██████╗
+██║██║   ██║██╔══██╗██╔══██╗
+██║██║   ██║███████║██████╔╝
+██║╚██╗ ██╔╝██╔══██║██╔══██╗
+██║ ╚████╔╝ ██║  ██║██║  ██║
+╚═╝  ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═╝
+            `}
+          </Text>
+
+          <Text
+            as="pre"
+            color="white"
+            fontSize="md"
+            fontFamily="monospace"
+            display={{ base: "none", md: "block" }}
+          >
             {String.raw`
 ██╗██╗   ██╗ █████╗ ██████╗    ██████╗ ███████╗██╗   ██╗
 ██║██║   ██║██╔══██╗██╔══██╗   ██╔══██╗██╔════╝██║   ██║
@@ -21,7 +45,7 @@ function Dashboard() {
 ██║╚██╗ ██╔╝██╔══██║██╔══██╗   ██║  ██║██╔══╝  ╚██╗ ██╔╝
 ██║ ╚████╔╝ ██║  ██║██║  ██║██╗██████╔╝███████╗ ╚████╔╝
 ╚═╝  ╚═══╝  ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═════╝ ╚══════╝  ╚═══╝
-          `}
+            `}
           </Text>
         </Box>
         <Terminal />

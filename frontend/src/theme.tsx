@@ -1,6 +1,13 @@
 import { extendTheme } from "@chakra-ui/react"
+import '@fontsource-variable/jetbrains-mono'
+import '@fontsource-variable/source-code-pro'
+import '@fontsource-variable/inconsolata'
 
 const theme = extendTheme({
+  fonts: {
+    heading: `'Inconsolata Variable'`,
+    body: `'Source Code Pro Variable', 'JetBrains Mono Variable', monospace`
+  },
   colors: {
     ui: {
       main: "#222727",

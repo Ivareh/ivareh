@@ -1,52 +1,46 @@
 /// <reference types="vite/client" />
 import { useRef, useState, useEffect, memo } from "react"
-
 import gsap from "gsap"
-import { useGSAP } from "@gsap/react";
-import { Flex, Text } from "@chakra-ui/react"
+import { useGSAP } from "@gsap/react"
+import { Box, Text, TextProps } from "@chakra-ui/react"
 
 export interface Text {
-  text: string;
-  speed: "slow" | "fast";
+  text: string
+  duration: number
+  stagger: number
 }
 
-interface LoadTextProps {
+interface LoadTextProps extends TextProps {
   texts: Text[]
-  setProcessingPrompt: (state: boolean) => void;
+  setProcessingPrompt: (state: boolean) => void
 }
 
-
-const LoadAnimatedText = ({ texts, setProcessingPrompt }: LoadTextProps) => {
+const LoadAnimatedText = ({ texts, setProcessingPrompt, ...props }: LoadTextProps) => {
   const [animated, setAnimated] = useState<Set<number>>(new Set<number>([]))
-  const containerRef = useRef<HTMLDivElement>(null);
-  const tl = useRef<gsap.core.Timeline>();
+  const containerRef = useRef<HTMLDivElement>(null)
+  const tl = useRef<gsap.core.Timeline>()
 
-  useGSAP(() => {
-    tl.current = gsap.timeline({
-      onStart: () => setProcessingPrompt(true),
-      onComplete: () => setProcessingPrompt(false),
-    }
-    );
+  useGSAP(
+    () => {
+      tl.current = gsap.timeline({
+        onStart: () => setProcessingPrompt(true),
+        onComplete: () => setProcessingPrompt(false),
+      })
 
-    texts.forEach((_, index) => {
-      if (!(animated.has(index))) {
-        tl.current!.fromTo(
-          `.loadTextSlow-${index}`,
-          { opacity: 0 },
-          { opacity: 1, duration: 0.08, stagger: 0.07 },
-          ">"
-        );
-
-        tl.current!.fromTo(
-          `.loadTextFast-${index}`,
-          { opacity: 0 },
-          { opacity: 1, duration: 0.00001, stagger: 0 },
-          ">"
-        );
-      }
-      setAnimated((prev) => new Set([...prev, index]))
-    });
-  }, { dependencies: [texts], scope: containerRef });
+      texts.forEach((text, index) => {
+        if (!animated.has(index)) {
+          tl.current!.fromTo(
+            `.loadText-${index}`,
+            { opacity: 0 },
+            { opacity: 1, duration: text.duration, stagger: text.stagger },
+            ">"
+          )
+        }
+        setAnimated((prev) => new Set([...prev, index]))
+      })
+    },
+    { dependencies: [texts], scope: containerRef }
+  )
 
   useEffect(() => {
     if (tl.current && tl.current.isActive()) {
@@ -54,41 +48,70 @@ const LoadAnimatedText = ({ texts, setProcessingPrompt }: LoadTextProps) => {
     }
 
     if (containerRef.current) {
-      // Scroll to the bottom of the container
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+      containerRef.current.scrollTop = containerRef.current.scrollHeight
     }
   }, [tl.current])
 
   const renderText = (text: Text, textIndex: number) => {
-    const className = `loadText${text.speed === 'slow' ? 'Slow' : 'Fast'}-${textIndex}`;
-    return text.text.split("\n").map((line, lineIndex) => (
-      <Flex key={`${textIndex}-${lineIndex}`} whiteSpace="pre" as="span">
-        {line.split('').map((char, charIndex) => (
-          char === ' ' ? (
-            <Text key={`${textIndex}-${lineIndex}-${charIndex}`} as="span">&nbsp;</Text>
-          ) : (
-            <Text
-              key={`${textIndex}-${lineIndex}-${charIndex}`}
-              className={className}
-              as="span"
-            >
-              {char}
-            </Text>
-          )
-        ))}
-      </Flex>
-    ));
-  };
+    const className = `loadText-${textIndex}`
+    return text.text.split("\n").map((line, lineIndex) => {
+      // Split line into words and spaces while preserving original spacing
+      const tokens = line.split(/(\s+)/).filter(t => t !== "")
+
+      return (
+        <Text
+          key={`${textIndex}-${lineIndex}`}
+          whiteSpace="pre-wrap"
+          display="block"
+          {...props}
+        >
+          {tokens.map((token, tokenIndex) => {
+            if (/\s/.test(token)) {
+              // Render preserved whitespace
+              return (
+                <Text
+                  as="span"
+                  whiteSpace="pre"
+                  key={`${textIndex}-${lineIndex}-space-${tokenIndex}`}
+                >
+                  {token}
+                </Text>
+              )
+            }
+            // Render word with characters
+            return (
+              <Text
+                as="span"
+                display="inline-block"
+                whiteSpace="nowrap"
+                key={`${textIndex}-${lineIndex}-word-${tokenIndex}`}
+              >
+                {token.split("").map((char, charIndex) => (
+                  <Text
+                    key={`${textIndex}-${lineIndex}-word-${tokenIndex}-char-${charIndex}`}
+                    className={className}
+                    as="span"
+                  >
+                    {char}
+                  </Text>
+                ))}
+              </Text>
+            )
+          })}
+        </Text>
+      )
+    })
+  }
 
   return (
-    <Flex maxH={200} overflowY="auto" scrollBehavior="smooth" color="white" flexDirection="column" ref={containerRef}>
-      {texts.map((text, textIndex) => (
-        <div key={textIndex}>
-          {renderText(text, textIndex)}
-        </div>
-      ))}
-    </Flex>
-  );
-};
+    <Box ref={containerRef} >
+      {
+        texts.map((text, textIndex) => (
+          <div key={textIndex}>{renderText(text, textIndex)}</div>
+        ))
+      }
+    </Box>
+  )
+}
 
 export default memo(LoadAnimatedText)

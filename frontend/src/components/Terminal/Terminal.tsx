@@ -1,12 +1,22 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useReducer, useRef } from "react"
 import { v4 as uuidv4 } from "uuid"
-
 import { Box } from "@chakra-ui/react"
-
 import TerminalPrompter from "./TerminalPrompter"
 import LoadAnimatedText, { Text } from "../Terminal/Animation/LoadAnimatedText"
-import LoadAnimatedImages from "../Terminal/Animation/LoadAnimatedImages"
-import commands from "../Terminal/Commands"
+import LoadBread from "../Terminal/Animation/Load/LoadBread"
+import { genTextCommands, genContentCommands } from "../Terminal/Commands"
+
+type State = { [key: string]: boolean };
+type Action = { key: string; load: boolean };
+
+const getContentReducer = (state: State, action: Action): State => {
+  switch (action.key) {
+    case "reset":
+      return {} as State
+    default:
+      return { ...state, [action.key]: action.load };
+  }
+};
 
 const Terminal = () => {
   const introTexts: Text[] = [{
@@ -14,46 +24,76 @@ const Terminal = () => {
 Welcome to my terminal.
 
 ----------------
-`, speed: "slow"
+`, duration: 0.08, stagger: 0.07
   },
-  { text: `Need help? Type 'help' and hit ENTER or RETURN`, speed: "fast" },
+  { text: `Need help? Type 'help' and hit ENTER or RETURN`, duration: 0.00001, stagger: 0 }
   ]
 
+  const [contentState, dispatch] = useReducer(getContentReducer, {} as State);
   const commandNotFound = (prompt: string) => `command not found: ${prompt}`
-
   const [textsToGen, setTextsToGen] = useState<Text[]>(introTexts)
-
+  const termAnimTextContainer = useRef<HTMLDivElement>(null)
   const [processingPrompt, setProcessingPrompt] = useState<boolean>()
   const [prompt, setPrompt] = useState<string>()
   const [termKey, setTermKey] = useState<string>()
 
+  // Scroll to bottom whenever texts or content state changes
+  useEffect(() => {
+    const container = termAnimTextContainer.current
+    if (container) {
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior: "smooth"
+      })
+    }
+  }, [textsToGen, contentState]) // Depend on both content changes
+
   useEffect(() => {
     if (prompt) {
       const latestPrompt = prompt.split(/\$(.*)/s)[1]
+      const genText = latestPrompt in genTextCommands
 
-      if (!(latestPrompt in commands)) {
+      if (genContentCommands.has(latestPrompt)) {
+        dispatch({ key: latestPrompt, load: true })
+      }
+
+      if (!genText) {
         const commandNotFoundMsg = commandNotFound(latestPrompt)
-        setTextsToGen((prev) => [...prev, { text: commandNotFoundMsg, speed: "fast" }])
+        setTextsToGen((prev) => [...prev, { text: commandNotFoundMsg, duration: 0.00001, stagger: 0 }])
         return
       }
 
-      setTextsToGen((prev) => [...prev, { text: commands[latestPrompt], speed: "fast" }])
-      if (latestPrompt === "clear") {
-        setTextsToGen([{ text: "", speed: "fast" }])
-        setTermKey(uuidv4())
+      if (genText) {
+        setTextsToGen((prev) => [...prev, { text: genTextCommands[latestPrompt], duration: 0.00001, stagger: 0 }])
+        if (latestPrompt === "clear") {
+          dispatch({ key: "reset", load: false })
+          setTextsToGen([{ text: "", duration: 0.00001, stagger: 0 }])
+          setTermKey(uuidv4())
+        }
       }
     }
-  }, [prompt])
+  }, [prompt]) // Removed ref from dependencies as it's not needed
 
   return (
-    <Box height="auto" p={1} borderColor="ui.tmuxBorder" borderWidth={"1px"} key={termKey} >
-      <LoadAnimatedText setProcessingPrompt={setProcessingPrompt} texts={textsToGen} />
-      <TerminalPrompter
+    <Box height="auto" p={1} borderColor="ui.tmuxBorder" borderWidth={"1px"} >
+      <Box
+        ref={termAnimTextContainer}
+        maxH={200}
+        overflowY="auto"
+        scrollBehavior="smooth"
+        color="white"
+        flexDirection="column"
+        width="100%"
+      >
+        <LoadAnimatedText setProcessingPrompt={setProcessingPrompt} texts={textsToGen} />
+      </Box>
+      {!processingPrompt && <TerminalPrompter
         setPrompt={setPrompt}
         style={{ visibility: processingPrompt ? 'hidden' : 'visible' }}
-        key={processingPrompt ? "hidden" : "visible"}
+        key={termKey + "tp"}
       />
-      <LoadAnimatedImages setProcessingPrompt={setProcessingPrompt} images={null} />
+      }
+      {contentState["bread"] && <LoadBread setProcessingPrompt={setProcessingPrompt} />}
     </Box>
   )
 }

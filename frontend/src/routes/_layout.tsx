@@ -28,8 +28,8 @@ function Layout() {
 
   return (
     <Flex bgColor="ui.main" sx={{
-      height: "calc(var(--vh, 1vh) * 100)",
-      width: "calc(var(--vw, 1vw) * 100)"
+      height: "calc(var(--vh, 1vh) * 99.94)",
+      width: "calc(var(--vw, 1vw) * 99.999)"
     }} >
       <Outlet />
     </Flex>
