@@ -14,8 +14,8 @@ import type {
   EndpointApiV1ImagesIdDeleteResponse,
   UpsertMultipleImagesApiV1UpsertMultiImagesPostData,
   UpsertMultipleImagesApiV1UpsertMultiImagesPostResponse,
-  GetMultiImagesApiV1GetMultiImagesGetData,
-  GetMultiImagesApiV1GetMultiImagesGetResponse,
+  GetMultiImagesApiV1GetMultiImagesPostData,
+  GetMultiImagesApiV1GetMultiImagesPostResponse,
   HealthCheckApiV1UtilsHealthCheckGetResponse,
   GetContainerSasApiV1UtilsContainerSasTokenGetResponse,
 } from "./types.gen"
@@ -143,23 +143,22 @@ export class ImagesService {
    * @param data The data for the request.
    * @param data.limit
    * @param data.offset
-   * @param data.sortColumns
-   * @param data.sortOrders
+   * @param data.requestBody
    * @returns unknown Successful Response
    * @throws ApiError
    */
-  public static getMultiImagesApiV1GetMultiImagesGet(
-    data: GetMultiImagesApiV1GetMultiImagesGetData = {},
-  ): CancelablePromise<GetMultiImagesApiV1GetMultiImagesGetResponse> {
+  public static getMultiImagesApiV1GetMultiImagesPost(
+    data: GetMultiImagesApiV1GetMultiImagesPostData = {},
+  ): CancelablePromise<GetMultiImagesApiV1GetMultiImagesPostResponse> {
     return __request(OpenAPI, {
-      method: "GET",
+      method: "POST",
       url: "/api/v1/get_multi_images",
       query: {
         limit: data.limit,
         offset: data.offset,
-        sort_columns: data.sortColumns,
-        sort_orders: data.sortOrders,
       },
+      body: data.requestBody,
+      mediaType: "application/json",
       errors: {
         422: "Validation Error",
       },
