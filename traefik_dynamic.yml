@@ -1,0 +1,19 @@
+http:
+  routers:
+    azurite:
+      rule: "Host(`blob-storage.localhost`)"
+      service: azurite
+      entryPoints:
+        - web
+      middlewares:
+        - rewrite-host
+  middlewares:
+    rewrite-host:
+      headers:
+        customRequestHeaders:
+          Host: "localhost"
+  services:
+    azurite:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:10000"
