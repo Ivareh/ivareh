@@ -1,7 +1,7 @@
 http:
   routers:
     azurite:
-      rule: "Host(`blob-storage.localhost`)"
+      rule: "Host(`blob-storage.${DOMAIN}`)"
       service: azurite
       entryPoints:
         - web

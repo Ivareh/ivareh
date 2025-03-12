@@ -1,5 +1,4 @@
 services:
-
   db:
     image: postgres:12
     restart: always
@@ -123,7 +122,7 @@ services:
       - traefik.docker.network=traefik-public
       - traefik.constraint-label=traefik-public
 
-      - traefik.http.routers.azurite.rule=Host(`blob-storage.localhost`)
+      - traefik.http.routers.azurite.rule=Host(`blob-storage.${DOMAIN}`)
       - traefik.http.routers.azurite.entrypoints=http
       - traefik.http.routers.azurite.middlewares=rewrite-host@docker
       - traefik.http.middlewares.rewrite-host.headers.customrequestheaders.Host=localhost
