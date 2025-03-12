@@ -10,6 +10,8 @@ from azure.storage.blob import BlobServiceClient, ContainerClient
 
 
 OBJ_IGNORE_LIST = set([".gitkeep"])
+AZURITE_SERVER = os.getenv("AZURITE_SERVER")
+AZURITE_ACCOUNT_KEY = os.getenv("AZURITE_ACCOUNT_KEY")
 
 
 def get_correct_dimensions(img):
@@ -128,13 +130,10 @@ if __name__ == "__main__":
     print("Waiting for localhost emulator connection 5 secs...")
     sleep(5)
     blob_service_client = BlobServiceClient(
-        account_url="http://localhost:10000/devstoreaccount1",
+        account_url=f"http://{AZURITE_SERVER}:10000/devstoreaccount1",
         credential={
             "account_name": "devstoreaccount1",
-            "account_key": (
-                "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq"
-                "/K1SZFPTOtr/KBHBeksoGMGw=="
-            ),
+            "account_key": AZURITE_ACCOUNT_KEY,  # type: ignore
         },
     )
     print("Finished waiting and initialized Blob Service Client")

@@ -8,6 +8,10 @@ from azure.storage.blob import BlobServiceClient, BlobProperties
 from azure.core.paging import ItemPaged
 
 
+AZURITE_ACCOUNT_KEY = os.getenv("AZURITE_ACCOUNT_KEY")
+AZURITE_SERVER = os.getenv("AZURITE_SERVER")
+
+
 def send_data(api_url: str, json_data: list[dict[str, str]]) -> Response | None:
     try:
         response = post(api_url, json=json_data)
@@ -67,16 +71,14 @@ if __name__ == "__main__":
         args = parser.parse_args()
         containers_directory = args.directory
 
-        account_url = "http://localhost:10000/devstoreaccount1"
+        port = ":10000" if AZURITE_SERVER == "localhost" else ""
+        account_url = f"http://{AZURITE_SERVER}{port}/devstoreaccount1"
 
         blob_service_client = BlobServiceClient(
             account_url=account_url,
             credential={
                 "account_name": "devstoreaccount1",
-                "account_key": (
-                    "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq"
-                    "/K1SZFPTOtr/KBHBeksoGMGw=="
-                ),
+                "account_key": AZURITE_ACCOUNT_KEY,  # type: ignore
             },
         )
 

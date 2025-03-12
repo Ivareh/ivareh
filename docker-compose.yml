@@ -107,6 +107,7 @@ services:
     env_file:
       - .env
     environment:
+      - AZURITE_SERVER=${AZURITE_SERVER}
       - AZURITE_VERSION=${AZURITE_VERSION}
       - AZURITE_ACCOUNT_NAME=${AZURITE_ACCOUNT_NAME}
       - AZURITE_ACCOUNT_KEY=${AZURITE_ACCOUNT_KEY}
@@ -122,19 +123,10 @@ services:
       - traefik.docker.network=traefik-public
       - traefik.constraint-label=traefik-public
 
-      - traefik.http.services.${STACK_NAME?Variable not set}-blob.loadbalancer.server.port=10000
-
-      - traefik.http.routers.${STACK_NAME?Variable not set}-blob-http.rule=Host(`blob-storage.${DOMAIN?Variable not set}`)
-      - traefik.http.routers.${STACK_NAME?Variable not set}-blob-http.entrypoints=http
-
-      - traefik.http.routers.${STACK_NAME?Variable not set}-blob-https.rule=Host(`blob-storage.${DOMAIN?Variable not set}`)
-      - traefik.http.routers.${STACK_NAME?Variable not set}-blob-https.entrypoints=https
-      - traefik.http.routers.${STACK_NAME?Variable not set}-blob-https.tls=true
-      - traefik.http.routers.${STACK_NAME?Variable not set}-blob-https.tls.certresolver=le
-
-      # Enable redirection for HTTP and HTTPS
-      - traefik.http.routers.${STACK_NAME?Variable not set}-blob-http.middlewares=https-redirect
-
+      - traefik.http.routers.azurite.rule=Host(`blob-storage.localhost`)
+      - traefik.http.routers.azurite.entrypoints=http
+      - traefik.http.routers.azurite.middlewares=rewrite-host@docker
+      - traefik.http.middlewares.rewrite-host.headers.customrequestheaders.Host=localhost
 
   frontend:
    image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'
