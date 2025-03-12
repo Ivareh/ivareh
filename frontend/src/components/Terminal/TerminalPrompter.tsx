@@ -1,4 +1,4 @@
-import { useState, memo, useRef, useEffect } from "react"
+import { useState, useRef, useEffect } from "react"
 
 import { Flex, FlexProps, Textarea } from "@chakra-ui/react"
 
