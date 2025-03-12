@@ -100,12 +100,16 @@ services:
   blob-storage:
     image: '${DOCKER_IMAGE_BLOB_STORAGE?Variable not set}:${TAG-latest}'
     restart: always
+    networks:
+      - traefik-public
+      - default
     depends_on:
       - db
       - backend
     env_file:
       - .env
     environment:
+      - DOMAIN=${DOMAIN}
       - AZURITE_SERVER=${AZURITE_SERVER}
       - AZURITE_VERSION=${AZURITE_VERSION}
       - AZURITE_ACCOUNT_NAME=${AZURITE_ACCOUNT_NAME}
@@ -122,7 +126,7 @@ services:
       - traefik.docker.network=traefik-public
       - traefik.constraint-label=traefik-public
 
-      - traefik.http.routers.azurite.rule=Host(`blob-storage.${DOMAIN}`)
+      - traefik.http.routers.azurite.rule=Host(`blob-storage.${DOMAIN?Variable not set}`)
       - traefik.http.routers.azurite.entrypoints=http
       - traefik.http.routers.azurite.middlewares=rewrite-host@docker
       - traefik.http.middlewares.rewrite-host.headers.customrequestheaders.Host=localhost

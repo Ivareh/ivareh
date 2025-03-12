@@ -7,7 +7,7 @@ import os
 from azure.storage.blob import BlobServiceClient, BlobProperties
 from azure.core.paging import ItemPaged
 
-
+DOMAIN = os.getenv("DOMAIN")
 AZURITE_ACCOUNT_KEY = os.getenv("AZURITE_ACCOUNT_KEY")
 AZURITE_SERVER = os.getenv("AZURITE_SERVER")
 
@@ -71,11 +71,8 @@ if __name__ == "__main__":
         args = parser.parse_args()
         containers_directory = args.directory
 
-        port = ":10000" if AZURITE_SERVER == "localhost" else ""
-        account_url = f"http://{AZURITE_SERVER}{port}/devstoreaccount1"
-
         blob_service_client = BlobServiceClient(
-            account_url=account_url,
+            account_url="http://localhost:10000/devstoreaccount1",
             credential={
                 "account_name": "devstoreaccount1",
                 "account_key": AZURITE_ACCOUNT_KEY,  # type: ignore
@@ -83,6 +80,12 @@ if __name__ == "__main__":
         )
 
         api_url = "http://backend:8000/api/v1/upsert_multi_images"
+        save_api_host = (
+            "localhost:10000"
+            if AZURITE_SERVER == "localhost"
+            else f"{AZURITE_SERVER}.{DOMAIN}"
+        )
+        save_api_url = f"http://{save_api_host}/devstoreaccount1"
 
         print("Creating and sending API objects")
         for container_name in os.listdir(containers_directory):
@@ -92,7 +95,7 @@ if __name__ == "__main__":
                 blob_list = blob_service_client.get_container_client(
                     container_name
                 ).list_blobs(include=["metadata"])
-                data = create_api_objects(blob_list, container_name, account_url)
+                data = create_api_objects(blob_list, container_name, save_api_url)
                 send_data(api_url=api_url, json_data=data)
         print("Finished creating and sending API objects")
     except Exception as ex:
