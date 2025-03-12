@@ -127,10 +127,24 @@ services:
       - traefik.docker.network=traefik-public
       - traefik.constraint-label=traefik-public
 
-      - traefik.http.routers.azurite.rule=Host(`blob-storage.${DOMAIN?Variable not set}`)
-      - traefik.http.routers.azurite.entrypoints=http
-      - traefik.http.routers.azurite.middlewares=rewrite-host@docker
-      - traefik.http.middlewares.rewrite-host.headers.customrequestheaders.Host=localhost
+      # HTTP Router (redirects to HTTPS)
+      - traefik.http.routers.blob-storage-http.rule=Host(`blob-storage.${DOMAIN}`)
+      - traefik.http.routers.blob-storage-http.entrypoints=http
+      - traefik.http.routers.blob-storage-http.middlewares=https-redirect
+
+      # HTTPS Router
+      - traefik.http.routers.blob-storage-https.rule=Host(`blob-storage.${DOMAIN}`)
+      - traefik.http.routers.blob-storage-https.entrypoints=https
+      - traefik.http.routers.blob-storage-https.tls=true
+      - traefik.http.routers.blob-storage-https.tls.certresolver=le
+
+      # Service Configuration
+      - traefik.http.services.blob-storage.loadbalancer.server.port=10000
+
+      # Host Header Adjustment (if needed)
+      - traefik.http.routers.blob-storage-https.middlewares=rewrite-host@docker
+      - traefik.http.middlewares.rewrite-host.headers.customrequestheaders.Host=blob-storage:10000
+
 
   frontend:
    image: '${DOCKER_IMAGE_FRONTEND?Variable not set}:${TAG-latest}'

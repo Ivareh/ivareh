@@ -16,4 +16,4 @@ http:
     azurite:
       loadBalancer:
         servers:
-          - url: "http://localhost:10000"
+          - url: "http://blob-storage:10000"
